@@ -2,7 +2,7 @@
 
 pipelines:
 - nodes:
-  - label: buildslaves_rng-zeng08l021
+  - label: lucx_agent
     executionOrder: 0
     stages:
     - name: Stage 1
