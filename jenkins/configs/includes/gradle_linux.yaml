@@ -1,0 +1,49 @@
+  - label: linux && docker
+    name: linux
+    executionOrder: ^TPL:executionOrder;
+    pre:
+    - name: renew proxy token
+      executionOrder: 0
+      steps:
+      - cmd: echo "^PASSWORD;" | kinit
+    stages:
+    - name: Git linux
+      executionOrder: 0
+      steps:
+      - call: Repository.prepareGitRepo
+
+    - name: Changed Files linux
+      condition:
+      - runIfAny:
+        - LUCX_PULL_REQUEST
+      executionOrder: 1
+      steps:
+      - cmd: echo 'CHANGED FILES ^CHANGED_FILES;'
+
+    - name: Gradle linux
+      executionOrder: 1
+      timeLimitInMinutes: 15
+      steps:
+      - cmd: ./.devcontainer/initialize-command.sh && ^YAML:dockerComposeCommand; "./.devcontainer/post-start-command.sh"
+        name: gradle_linux setup env
+      - cmd: ^YAML:dockerComposeCommand;
+            "gradle -q dependencies"
+        name: gradle_linux dependencies
+      - cmd: ^YAML:dockerComposeCommand;
+            gradle
+        name: gradle_linux build
+      publish:
+      - afterFail: true
+        reportName: Gradle linux
+        reportDir: build/reports
+        reportFiles: StaticCodeAnalysis/main.html, StaticCodeAnalysis/test.html, tests/test/index.html, CodeCoverage/index.html
+        reportTitles: Static Code Analysis (Main), Static Code Analysis (Test), Tests, Code Coverage
+      - afterFail: true
+        reportName: GroovyDoc linux
+        reportDir: build/docs/groovydoc
+        reportFiles: index.html
+        reportTitles: GroovyDoc
+      stash:
+      - name: lucxbau_jar_linux
+        includes: lucxbau.jar
+        fromPath: build/libs

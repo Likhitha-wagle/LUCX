@@ -1,0 +1,18 @@
+- nodes:
+  - executionOrder: 0
+    name: lucxbox mirror sync
+    label: linux
+    stages:
+    - name: git
+      executionOrder: 0
+      steps:
+      - call: Repository.prepareGitRepo
+    - name: sync soco01 mirror
+      executionOrder: 1
+      steps:
+      - call: Git.cmd
+        exec: git fetch --prune --all --tags --force
+        name: git fetch all
+      - call: Git.cmd
+        exec: git push --prune ssh://git@sourcecode01.de.bosch.com:7999/lucx/lucxbau.git +refs/remotes/origin/*:refs/heads/* +refs/tags/*:refs/tags/*
+        name: git push soco01

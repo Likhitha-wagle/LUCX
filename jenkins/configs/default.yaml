@@ -1,0 +1,11 @@
+^INCLUDE:jenkins/configs/includes/properties.yaml;
+
+pipelines:
+- nodes:
+  - label: buildslaves_rng-zeng08l021
+    executionOrder: 0
+    stages:
+    - name: Stage 1
+      executionOrder: 0
+      steps:
+      - cmd: echo "Hello World!!"

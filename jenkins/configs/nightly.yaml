@@ -1,0 +1,5 @@
+^INCLUDE:jenkins/configs/includes/properties.yaml;
+
+
+pipelines:
+- ^INCLUDE:jenkins/configs/includes/mirror-sync.yaml;

@@ -1,0 +1,11 @@
+properties:
+  abortIfNotLatest: soft
+  workspaceName: lucxbau
+  buildDiscarder:
+    days: 7
+    num: 10
+
+dockerComposeCommand: >
+  export CONTAINER_UID=$(id -u) && export CONTAINER_GID=$(id -g) && export CONTAINER_USER=$(whoami) &&
+  DOCKER_BUILDKIT=1 docker compose build --pull cx-env
+  && docker compose run --rm -v "^SSHKEY:LUCXSSH;":${HOME}/.ssh/id_rsa:ro cx-env

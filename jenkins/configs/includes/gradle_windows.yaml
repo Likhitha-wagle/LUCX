@@ -1,0 +1,38 @@
+  - label: gradle && windows
+    name: "windows"
+    executionOrder: ^TPL:executionOrder;
+    stages:
+    - name: Git windows
+      executionOrder: 0
+      steps:
+      - call: Repository.prepareGitRepo
+    - name: Changed Files windows
+      condition:
+      - runIfAny:
+        - LUCX_PULL_REQUEST
+      executionOrder: 1
+      steps:
+      - cmd: echo 'CHANGED FILES ^CHANGED_FILES;'
+    - name: Gradle windows
+      executionOrder: 1
+      timeLimitInMinutes: 15
+      steps:
+      - cmd: gradle -q dependencies -Dhttp.proxyHost=localhost -Dhttp.proxyPort=3128 -Dhttps.proxyHost=localhost -Dhttps.proxyPort=3128
+        name: gradle_windows dependencies
+      - cmd: gradle -Dhttp.proxyHost=localhost -Dhttp.proxyPort=3128 -Dhttps.proxyHost=localhost -Dhttps.proxyPort=3128
+        name: gradle_windows build
+      publish:
+      - afterFail: true
+        reportName: Gradle windows
+        reportDir: build/reports
+        reportFiles: StaticCodeAnalysis/main.html, StaticCodeAnalysis/test.html, tests/test/index.html, CodeCoverage/index.html
+        reportTitles: Static Code Analysis (Main), Static Code Analysis (Test), Tests, Code Coverage
+      - afterFail: true
+        reportName: GroovyDoc windows
+        reportDir: build/docs/groovydoc
+        reportFiles: index.html
+        reportTitles: GroovyDoc
+      stash:
+      - name: lucxbau_jar_windows
+        includes: lucxbau.jar
+        fromPath: build/libs
